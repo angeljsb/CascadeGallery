@@ -14,3 +14,9 @@ Uso de dos librerias personales:
   <li>LibreriaInterfacesGraficas: Libreria personal para interfaces con Swing (Repositorio no disponible)</li>
   <li>SimpleFile: Libreria personal para el manejo de archivos (Repositorio por ser subido)</li>
 </ul>
+
+<h2>Descargar</h2>
+
+Ejecutable JAR disponible en <a href="https://drive.google.com/file/d/1BI-OYiaWcvKx5hHALOjZj7SyT3JIuz2Q/view?usp=sharing" >Google Drive</a>
+
+<b>Advertencia!</b> Se requiere la maquina virtual de java para ejecutar el programa
