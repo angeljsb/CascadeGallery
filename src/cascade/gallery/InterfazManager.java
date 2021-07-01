@@ -23,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 
 /**
@@ -78,6 +80,13 @@ public class InterfazManager implements FilesChangeListener {
     public InterfazManager(){
         
         this.ventana = this.initFrame();
+        
+        
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }catch(ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace(System.err);
+        }
         
         this.panelPrincipal = new JPanel(new FullLayout());
         
