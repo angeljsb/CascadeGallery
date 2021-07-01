@@ -10,6 +10,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * Clase que, de forma simple, se encarga de crear y controlar los dialogos de
@@ -58,16 +59,19 @@ public class FileSelector {
     public FileSelector(Component parent){
         
         this.parentComponent = parent;
+        File home = FileSystemView.getFileSystemView().getHomeDirectory();
         
         this.chooserDir = new JFileChooser();
         this.chooserDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         this.chooserDir.setMultiSelectionEnabled(false);
+        this.chooserDir.setCurrentDirectory(home);
         
         this.chooserImages = new JFileChooser();
         this.chooserImages.setFileSelectionMode(JFileChooser.FILES_ONLY);
         this.chooserImages.setMultiSelectionEnabled(true);
         FileFilter ff = new FileNameExtensionFilter("Images", "jpg", "gif", "png");
         this.chooserImages.setFileFilter(ff);
+        this.chooserImages.setCurrentDirectory(home);
         
     }
     
