@@ -165,22 +165,25 @@ public class ImagesController {
     }
     
     public void resizeImage(ImageInfo image, int width){
+        if(image.getCurrentWidth() == width) return;
         BufferedImage resized = ImageLoader.resizeImage(image.getImage(), width, -1);
         image.setImage(resized);
     }
     
     public void validateSize(ImageInfo image){
-        if(maxWidth<image.getCurrentWidth()){
+        if(maxWidth<image.getRealWidth()){
+            if(image.getCurrentWidth() != image.getRealWidth()
+                    && image.getCurrentWidth() != maxWidth){
+                this.loadImage(image);
+            }
             this.resizeImage(image, maxWidth);
-        }else if(minWidth>image.getCurrentWidth()){
+        }else if(minWidth>image.getRealWidth()){
             if(image.getRealWidth() > image.getCurrentWidth()){
                 this.loadImage(image);
             }
             this.resizeImage(image, minWidth);
-        }else if(image.getRealWidth() > image.getCurrentWidth()
-                && image.getCurrentWidth() < maxWidth){
+        }else if(image.getCurrentWidth() != image.getRealWidth()){
             this.loadImage(image);
-            this.validateSize(image);
         }
     }
     
