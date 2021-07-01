@@ -48,9 +48,9 @@ public class ImagesView extends JPanel{
         
         for(int i= 0; i<this.getComponentCount(); i++){
             Component comp = this.getComponent(i);
-            if(comp instanceof ImageFileView){
-                ImageFileView imageFixWidth = (ImageFileView) comp;
-                imageFixWidth.setFitWidth(adjust);
+            if(comp instanceof ImageFixWidth){
+                ImageFixWidth imageFixWidth = (ImageFixWidth) comp;
+                imageFixWidth.setAjustWidth(adjust);
             }
         }
     }

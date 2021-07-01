@@ -32,7 +32,7 @@ import javax.swing.event.ChangeEvent;
  * 
  * @author Angel
  */
-public class InterfazManager implements FilesChangeListener, LoadMessageListener {
+public class InterfazManager implements FilesChangeListener {
     
     public static File iconFile = new File("icon.png");
     
@@ -285,11 +285,6 @@ public class InterfazManager implements FilesChangeListener, LoadMessageListener
         
         this.panelPrincipal.updateUI();
     }
-
-    @Override
-    public void load(float amount, String message) {
-        
-    }
     
     @Override
     public void filesChange(File... files){
@@ -309,10 +304,6 @@ public class InterfazManager implements FilesChangeListener, LoadMessageListener
             ImageFixWidth view = new ImageFixWidth();
             images[i].onChange = view::setShowImage;
             this.imagesPage.add(view);
-//            BaseFile baseFile = new BaseFile(file);
-//            ImageFile imageFile = new ImageFile(baseFile);
-//            ImageFileView view = new ImageFileView(imageFile);
-//            this.imagesPage.add(view);
         }
         
         this.controller.setImages(images);
