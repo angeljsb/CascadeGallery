@@ -48,9 +48,9 @@ public class ImagesView extends JPanel{
         
         for(int i= 0; i<this.getComponentCount(); i++){
             Component comp = this.getComponent(i);
-            if(comp instanceof ImageFileView){
-                ImageFileView imageFixWidth = (ImageFileView) comp;
-                imageFixWidth.setFitWidth(adjust);
+            if(comp instanceof ImageFixWidth){
+                ImageFixWidth imageFixWidth = (ImageFixWidth) comp;
+                imageFixWidth.setAjustWidth(adjust);
             }
         }
     }
@@ -91,6 +91,12 @@ public class ImagesView extends JPanel{
         return this.layout.getSeparacion();
     }
     
+    /**
+     * Obtiene el indice de un componente dentro del panel
+     * 
+     * @param child El componente cuyo indice se quiere buscar
+     * @return El indice del componente en el panel o -1 si no se encuentra
+     */
     public int indexOf(Component child){
         for(int i = 0; i<this.getComponentCount(); i++){
             if(this.getComponent(i)==child){
