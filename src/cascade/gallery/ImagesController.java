@@ -50,9 +50,7 @@ public class ImagesController {
         if(start==this.start && end == this.end) return;
         this.setStart(start);
         this.setEnd(end);
-        System.out.println("Setting range " + this.start + ", " + this.end);
         if(!this.isLoading()){
-            System.out.println("Proccessing");
             this.proccessChange();
         }
         this.deleteAllImages();
@@ -151,7 +149,6 @@ public class ImagesController {
     
     public void updateImage(ImageInfo image) {
         if(!image.isLoaded()){
-            System.out.println(image.getFile().getName());
             this.loadImage(image);
         }
         
