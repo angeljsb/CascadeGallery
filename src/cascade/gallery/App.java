@@ -92,6 +92,7 @@ public final class App {
         this.interfaz.addButtonsEvent(this::userSelectFiles);
 
         this.interfaz.getMenuManager().addSettingsAction(this::settingsButton);
+        this.interfaz.initDnD(this.filesControl);
         
         this.interfaz.showNotImagesMessage();
         

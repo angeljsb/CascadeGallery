@@ -11,14 +11,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -26,6 +26,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
+import simple.file.image.ImageLoader;
 
 /**
  * Clase que se encarga de controlar toda la interfaz de la aplicación
@@ -39,6 +40,44 @@ public class InterfazManager implements FilesChangeListener {
     public static File iconFile = new File("icon.png");
     
     /**
+     * Cambia el look and feel de los componentes swing al por defecto del
+     * sistema operativo
+     * 
+     * @since v1.0.4
+     */
+    public static void setLookAndFeelToSystem(){
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }catch(ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace(System.err);
+        }
+    }
+    
+    /**
+     * Crea el panel principal con la funcionalidad de drag and drop
+     * 
+     * @return El panel principal con su layout y funcionalidad
+     * 
+     * @since v1.0.4
+     */
+    private JPanel createMainPanel(){
+        JPanel panel = new JPanel(new FullLayout());
+        
+        return panel;
+    }
+    
+    private void addMenuAndPanel(JMenuBar menuBar, JPanel panel){
+        this.ventana.add(menuBar);
+        this.ventana.add(panel);
+        
+        BorderLayout layout = new BorderLayout();
+        this.ventana.setLayout(layout);
+        layout.addLayoutComponent(menuBar, BorderLayout.NORTH);
+        layout.addLayoutComponent(panel, BorderLayout.CENTER);
+        
+    }
+    
+    /**
      * Inicializa el scroll por defecto
      * 
      * @param view El componente sobre el cual hacer scroll
@@ -47,7 +86,7 @@ public class InterfazManager implements FilesChangeListener {
      * 
      * @since v1.0.0
      */
-    private static JScrollPane createDefaultScrollPane(Component view){
+    private JScrollPane createDefaultScrollPane(Component view){
         JScrollPane scroll = new JScrollPane(view);
         
         scroll.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
@@ -79,26 +118,15 @@ public class InterfazManager implements FilesChangeListener {
      */
     public InterfazManager(){
         
+        setLookAndFeelToSystem();
+        
         this.ventana = this.initFrame();
         
-        
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }catch(ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace(System.err);
-        }
-        
-        this.panelPrincipal = new JPanel(new FullLayout());
+        this.panelPrincipal = createMainPanel();
         
         this.menuManager = new MenuBarManager();
         
-        this.ventana.add(this.menuManager.getMainMenuBar());
-        this.ventana.add(this.panelPrincipal);
-        
-        BorderLayout layout = new BorderLayout();
-        this.ventana.setLayout(layout);
-        layout.addLayoutComponent(this.menuManager.getMainMenuBar(), BorderLayout.NORTH);
-        layout.addLayoutComponent(this.panelPrincipal, BorderLayout.CENTER);
+        this.addMenuAndPanel(this.menuManager.getMainMenuBar(), this.panelPrincipal);
         
         //inciar pagina error
         this.errorPage = new JLabel();
@@ -205,12 +233,7 @@ public class InterfazManager implements FilesChangeListener {
     private JFrame initFrame(){
         FabricaJFrame fabricaVentana = new FabricaJFrame();
         
-        BufferedImage icono = null;
-        try{
-            icono = ImageIO.read(iconFile);
-        }catch(IOException ex){
-            System.err.println(ex);
-        }
+        BufferedImage icono = ImageLoader.loadImage(iconFile);
         
         JFrame frame = fabricaVentana.crear("Cascade Gallery", icono);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -236,6 +259,22 @@ public class InterfazManager implements FilesChangeListener {
         
         this.getImagesPage().setAdjustWidth(adjust);
         this.getController().setMinWidth(min);
+    }
+    
+    /**
+     * Añade un drop target para el panel principal que envíe los archivos
+     * droppeados al controlador de imagenes pasado
+     * 
+     * @param filesControl Un controlador que controle las imagenes que
+     * caigan sobre la ventana
+     */
+    public void initDnD(ImageFilesControl filesControl){
+        
+        DragAndDropHandler dndh = new DragAndDropHandler(filesControl);
+        DropTarget dropTarget = new DropTarget(this.panelPrincipal, dndh);
+        
+        this.panelPrincipal.setDropTarget(dropTarget);
+        
     }
     
     /**
@@ -299,9 +338,12 @@ public class InterfazManager implements FilesChangeListener {
     @Override
     public void filesChange(File... files){
         if(files.length == 0){
+            this.ventana.setTitle("Cascade Gallery");
             this.showNotImagesMessage();
             return;
         }
+        
+        this.ventana.setTitle(createTitle(files));
         
         this.showImagesPage();
         
@@ -319,6 +361,11 @@ public class InterfazManager implements FilesChangeListener {
         this.controller.setImages(images);
         this.controller.setRange(0, 10);
         
+    }
+    
+    private String createTitle(File[] files){
+        return "Cascade Gallery - " + files[0].getParentFile().getName()
+                + " | " + files.length + " imagenes";
     }
     
 }

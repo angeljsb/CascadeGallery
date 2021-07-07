@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Clase que se encarga de controlar un conjunto de archivos de imagenes
@@ -217,6 +218,13 @@ public class ImageFilesControl {
         this.files = files;
     }
     
+    private File[] filterAndOrder(File[] input){
+        return Stream.of(input)
+                .filter(ImageFilesControl::isImage)
+                .sorted(ImageFilesControl::numberNameSort)
+                .toArray(File[]::new);
+    }
+    
     /**
      * Añade todas las imagenes en un directorio al arreglo actual de imagenes
      * 
@@ -249,6 +257,8 @@ public class ImageFilesControl {
      * @throws IOException Si alguno de los archivos no es una imagen
      */
     public File[] addImages(File[] images) throws IOException{
+        if(images == null) return setImages(this.files);
+        
         File[] concat = Arrays.copyOf(this.files, this.files.length + images.length);
         
         System.arraycopy(images, 0, concat, this.files.length, images.length);
@@ -289,13 +299,14 @@ public class ImageFilesControl {
      * @throws IOException Si alguno de los archivos no es una imagen
      */
     public File[] setImages(File[] images) throws IOException{
-        for(File image : images){
-            ImageFilesControl.verifyImage(image);
+        if(images == null){ 
+            this.setFiles(new File[0]);
+            return new File[0];
         }
         
-        Arrays.sort(images, ImageFilesControl::numberNameSort);
+        File[] filtered = filterAndOrder(images);
         
-        this.setFiles(images);
+        this.setFiles(filtered);
         
         return this.files;
     }
