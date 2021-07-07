@@ -37,7 +37,7 @@ import simple.file.image.ImageLoader;
  */
 public class InterfazManager implements FilesChangeListener {
     
-    public static File iconFile = new File("icon.png");
+    public static File iconFile = new File(App.RESOURCES, "image_icon.png");
     
     /**
      * Cambia el look and feel de los componentes swing al por defecto del
@@ -144,7 +144,8 @@ public class InterfazManager implements FilesChangeListener {
         this.notImagesPage = new JPanel();
         JPanel container = new JPanel(new GridLayout(0, 1));
         
-        JLabel labelNotImages = new JLabel("No hay imagenes mostradas");
+        JLabel labelNotImages = new JLabel("Selecciona o arrastra imagenes "
+                + "o una carpeta");
         
         JPanel containerButtons = new JPanel();
         JButton botonArchivos = new JButton(MenuBarManager.OPEN_FILES);

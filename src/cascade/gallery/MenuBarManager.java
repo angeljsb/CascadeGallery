@@ -6,10 +6,14 @@
 package cascade.gallery;
 
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.stream.Stream;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import simple.file.image.ImageLoader;
 
 /**
  * Objeto que controla el menú superior de la aplicación
@@ -20,8 +24,13 @@ import javax.swing.JMenuItem;
  */
 public class MenuBarManager {
     
+    public static final ImageIcon IMAGE_ICON = loadMenuIcon("image_icon.png"),
+            FOLDER_ICON = loadMenuIcon("folder.png"),
+            BROWSER_ICON = loadMenuIcon("browser.png");
+    
     public static final String GENERAL = "General",
             SETTINGS = "Ajustes",
+            VIEW = "Vista",
             OPEN_FILES = "Abrir imagenes",
             OPEN_FOLDER = "Abrir carpeta",
             ADD_FILES = "Añadir imagenes",
@@ -32,11 +41,19 @@ public class MenuBarManager {
             SETTINGS_SIZE_ADJUST = "Ajustar ancho",
             SETTINGS_SEPARATION_NOT = "Sin separación",
             SETTINGS_SEPARATION_SMALL = "Separadas",
-            SETTINGS_SEPARATION_BIG = "Mucha separación";
+            SETTINGS_SEPARATION_BIG = "Mucha separación",
+            VIEW_BROWSER = "Abrir en navegador";
     
     public JMenuBar menuBar;
     
-    public JMenu general, settings;
+    public JMenu general, settings, view;
+    
+    public static ImageIcon loadMenuIcon(String name){
+        File file = new File(App.RESOURCES, name);
+        BufferedImage image = ImageLoader.loadImage(file);
+        image = ImageLoader.resizeImage(image, 20, 20);
+        return new ImageIcon(image);
+    }
     
     /**
      * Inicializa el objeto que controla el menú superior
@@ -47,10 +64,10 @@ public class MenuBarManager {
         this.menuBar = new JMenuBar();
         
         this.general = new JMenu(GENERAL);
-        JMenuItem openFile = new JMenuItem(OPEN_FILES);
-        JMenuItem openFolder = new JMenuItem(OPEN_FOLDER);
-        JMenuItem addFile = new JMenuItem(ADD_FILES);
-        JMenuItem addFolder = new JMenuItem(ADD_FOLDER);
+        JMenuItem openFile = new JMenuItem(OPEN_FILES, IMAGE_ICON);
+        JMenuItem openFolder = new JMenuItem(OPEN_FOLDER, FOLDER_ICON);
+        JMenuItem addFile = new JMenuItem(ADD_FILES, IMAGE_ICON);
+        JMenuItem addFolder = new JMenuItem(ADD_FOLDER, FOLDER_ICON);
         general.add(openFile);
         general.add(openFolder);
         general.addSeparator();
@@ -76,8 +93,13 @@ public class MenuBarManager {
         this.settings.add(size);
         this.settings.add(separation);
         
+        this.view = new JMenu(VIEW);
+        JMenuItem openInBrowser = new JMenuItem(VIEW_BROWSER, BROWSER_ICON);
+        this.view.add(openInBrowser);
+        
         menuBar.add(general);
         menuBar.add(settings);
+        menuBar.add(view);
     }
     
     /**
@@ -122,6 +144,21 @@ public class MenuBarManager {
                 .filter(item -> item instanceof JMenuItem)
                 .map(item -> (JMenuItem)item)
                 .forEach(i -> i.addActionListener(al));
+    }
+    
+    /**
+     * Añade un escucha de evento para todos los items del menú vista
+     * 
+     * @param al El action listener que escuchará los eventos en los
+     * items de menú
+     * 
+     * @since v1.0.4
+     */
+    public void addViewAction(ActionListener al){
+        Stream.of(view.getMenuComponents())
+                .filter(item -> item instanceof JMenuItem)
+                .map(item -> (JMenuItem)item)
+                .forEach(menu -> menu.addActionListener(al));
     }
     
 }
