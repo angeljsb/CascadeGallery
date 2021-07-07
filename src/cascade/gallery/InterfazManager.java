@@ -338,9 +338,12 @@ public class InterfazManager implements FilesChangeListener {
     @Override
     public void filesChange(File... files){
         if(files.length == 0){
+            this.ventana.setTitle("Cascade Gallery");
             this.showNotImagesMessage();
             return;
         }
+        
+        this.ventana.setTitle(createTitle(files));
         
         this.showImagesPage();
         
@@ -358,6 +361,11 @@ public class InterfazManager implements FilesChangeListener {
         this.controller.setImages(images);
         this.controller.setRange(0, 10);
         
+    }
+    
+    private String createTitle(File[] files){
+        return "Cascade Gallery - " + files[0].getParentFile().getName()
+                + " | " + files.length + " imagenes";
     }
     
 }
