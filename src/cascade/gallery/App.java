@@ -19,6 +19,9 @@ import java.io.PrintStream;
  * @author Angel
  */
 public final class App {
+    
+    public static final File ERRORS = new File("errors.txt"),
+            RESOURCES = new File("resources");
 
     /**
      * Instancia única de la clase
@@ -27,15 +30,14 @@ public final class App {
     
     /**
      * Redirecciona la salida de errores de la aplicación al archivo 
-     * {@code error.txt}
+     * {@code errors.txt}
      * 
      * @since v1.0.1
      */
     public static void redirectOutput(){
         try{
-            File file = new File("errors.txt");
-            file.createNewFile();
-            PrintStream out = new PrintStream(new FileOutputStream(file)); 
+            ERRORS.createNewFile();
+            PrintStream out = new PrintStream(new FileOutputStream(ERRORS)); 
             System.setErr(out);
         }catch(IOException ex){
             System.err.println(ex);
@@ -90,6 +92,7 @@ public final class App {
 
         this.interfaz.getMenuManager().addGeneralAction(this::userSelectFiles);
         this.interfaz.addButtonsEvent(this::userSelectFiles);
+        this.interfaz.getMenuManager().addViewAction(this::viewMenu);
 
         this.interfaz.getMenuManager().addSettingsAction(this::settingsButton);
         this.interfaz.initDnD(this.filesControl);
@@ -135,8 +138,7 @@ public final class App {
             }
 
         } catch (IOException ex) {
-            System.err.println(ex);
-            this.interfaz.showErrorMessage(ex);
+            ex.printStackTrace(System.err);
         }
 
     }
@@ -166,6 +168,17 @@ public final class App {
                 break;
             case MenuBarManager.SETTINGS_SEPARATION_BIG:
                 this.interfaz.getImagesPage().setSeparation(50);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    public void viewMenu(ActionEvent e){
+        switch (e.getActionCommand()) {
+            case MenuBarManager.VIEW_BROWSER:
+                BrowserViewManager bvm = new BrowserViewManager();
+                bvm.show(this.filesControl.getImageFiles());
                 break;
             default:
                 break;

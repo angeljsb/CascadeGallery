@@ -57,7 +57,6 @@ public class DragAndDropHandler extends DropTargetAdapter {
                         this.filesControl.setImages(files.get(0));
                         break;
                     }else{
-                        System.out.println(files.get(0));
                         File[] arr = new File[0];
                         this.filesControl.setImages(files.toArray(arr));
                         break;
