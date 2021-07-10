@@ -179,9 +179,7 @@ public class InterfazManager implements FilesChangeListener {
             Component comp = this.imagesPage.getComponentAt(this.imagesPage.getWidth()/2,scroll);
             int index = this.imagesPage.indexOf(comp);
             if(index < 0) return;
-            int min = Math.max(index-10, 0);
-            int max = Math.min(index+10, this.imagesPage.getComponentCount());
-            this.controller.setRange(min, max);
+            this.controller.setCurrent(index);
         });
     }
 

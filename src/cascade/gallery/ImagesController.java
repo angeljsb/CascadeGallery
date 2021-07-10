@@ -21,8 +21,7 @@ public class ImagesController {
     
     private ImageInfo[] images = new ImageInfo[0];
     
-    private int start = 0;
-    private int end = 0;
+    private int start = 0, end = 0, current = 0;
     
     private int maxWidth = Integer.MAX_VALUE;
     private int minWidth = 0;
@@ -36,6 +35,10 @@ public class ImagesController {
 
     public int getEnd() {
         return end;
+    }
+    
+    public int getCurrent() {
+        return current;
     }
     
     public void setStart(int start){
@@ -54,6 +57,14 @@ public class ImagesController {
             this.proccessChange();
         }
         this.deleteAllImages();
+    }
+    
+    public void setCurrent(int current) {
+        if (this.current == current) return;
+        this.current = current;
+        int min = Math.max(0, current - 10);
+        int max = Math.min(this.images.length, current + 10);
+        this.setRange(min, max);
     }
 
     /**
@@ -111,6 +122,7 @@ public class ImagesController {
     
     public void proccessChange(){
         this.stopLoading();
+        if(images.length == 0) return;
         
         Runnable run = this::updateAllImages;
         this.loadThread = new Thread(run);
@@ -119,19 +131,24 @@ public class ImagesController {
     }
     
     public void updateAllImages(){
-        int initS = this.getStart();
-        for(int i = start; i<end; i++){
-            ImageInfo image = this.images[i];
-            
+        ImageInfo image;
+        while((image = nextUpdate())!=null){
             this.updateImage(image);
-            
-            if(this.stop){
-                return;
+        }
+    }
+    
+    private ImageInfo nextUpdate(){
+        for(int i=current; i<end; i++){
+            if(!images[i].isLoaded()){
+                return images[i];
             }
         }
-        if(initS!=this.getStart()){
-            this.updateAllImages();
+        for(int i=current-1; i>start; i--){
+            if(!images[i].isLoaded()){
+                return images[i];
+            }
         }
+        return null;
     }
     
     public void deleteAllImages(){
