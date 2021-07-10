@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.stream.Stream;
 
 /**
  * Clase principal de la aplicación
@@ -48,11 +49,12 @@ public final class App {
      * Función que devuelve una sola instancia de la clase durante la ejecución
      * de la aplicación
      *
+     * @param args Los argumentos de la linea de comandos
      * @return Una instancia de la clase
      */
-    public static App getInstance() {
+    public static App getInstance(String[] args) {
         if (App.instance == null) {
-            App.instance = new App();
+            App.instance = new App(args);
             App.redirectOutput();
         }
         return App.instance;
@@ -100,6 +102,37 @@ public final class App {
         this.interfaz.showNotImagesMessage();
         
         this.filesControl.setListener(this.interfaz);
+    }
+    
+    /**
+     * Constructor de la clase principal de la aplicación, inicializa
+     * la aplicación y carga el archivo o archivos pasados por linea
+     * de comandos
+     * 
+     * @since v1.0.4
+     */
+    private App(String[] paths) {
+        this();
+        
+        if(paths.length==0){
+            return;
+        }
+        
+        try{
+            File file = new File(paths[0]);
+            if(file.isDirectory()){
+                this.filesControl.addImages(file);
+            }else{
+                this.filesControl.addImages(
+                        Stream.of(paths)
+                            .map(File::new)
+                            .filter(f->f.exists())
+                            .toArray(File[]::new)
+                );
+            }
+        }catch(IOException ex){
+            ex.printStackTrace(System.err);
+        }
     }
 
     /**
