@@ -159,7 +159,7 @@ public class InterfazManager implements FilesChangeListener {
         container.add(containerButtons);
         this.notImagesPage.add(container);
         
-        controller.setMaxWidth(this.ventana.getWidth());
+        controller.setMaxWidth(this.ventana.getContentPane().getWidth());
         
         SizeListener l = new SizeListener((size) -> {
             if(size.width>0){

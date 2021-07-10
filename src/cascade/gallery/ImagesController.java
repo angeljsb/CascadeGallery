@@ -143,7 +143,7 @@ public class ImagesController {
                 return images[i];
             }
         }
-        for(int i=current-1; i>start; i--){
+        for(int i=current-1; i>=start; i--){
             if(!images[i].isLoaded()){
                 return images[i];
             }

@@ -24,7 +24,7 @@ public class ImageFixWidth extends JPanel {
     
     private boolean ajustWidth = false;
     
-    private int lastHeight = 0;
+    private Dimension lastSize = new Dimension(0, 0);
     
     /**
      * Crea un componente sin una imagen, el cual tendrá un tamaño de 0, 0
@@ -101,12 +101,13 @@ public class ImageFixWidth extends JPanel {
     
     @Override
     public Dimension getPreferredSize(){
-        if(this.showImage == null){
-            return new Dimension(this.getWidth(),this.lastHeight);
+        int imgWidth = this.lastSize.width,
+                imgHeight = this.lastSize.height;
+        
+        if(imgHeight==0 || imgWidth==0){
+            return this.lastSize;
         }
         
-        int imgWidth = showImage.getWidth(this),
-                imgHeight = showImage.getHeight(this);
         float relation = (float)imgWidth/(float)imgHeight;
         
         if(this.isAjustWidth()){
@@ -136,8 +137,9 @@ public class ImageFixWidth extends JPanel {
      */
     public void setShowImage(BufferedImage showImage) {
         this.showImage = showImage;
-        if(showImage!=null && showImage.getWidth()<=this.getWidth()){
-            this.lastHeight = showImage.getHeight();
+        
+        if(showImage!=null){
+            this.lastSize = new Dimension(showImage.getWidth(), showImage.getHeight());
         }
         
         this.updateUI();
@@ -151,7 +153,7 @@ public class ImageFixWidth extends JPanel {
      * @since v1.0.0
      */
     public boolean isAjustWidth() {
-        return ajustWidth || showImage.getWidth(this) > this.getWidth();
+        return ajustWidth || lastSize.width > this.getWidth();
     }
 
     /**
