@@ -359,7 +359,6 @@ public class InterfazManager implements FilesChangeListener {
         
         this.controller.setImages(images);
         this.controller.setCurrent(0);
-        this.controller.setRange(0, 10);
         
     }
     

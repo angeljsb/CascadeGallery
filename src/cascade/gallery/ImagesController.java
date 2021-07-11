@@ -21,7 +21,7 @@ public class ImagesController {
     
     private ImageInfo[] images = new ImageInfo[0];
     
-    private int start = 0, end = 0, current = 0;
+    private int start = 0, end = 0, current = -1;
     
     private int maxWidth = Integer.MAX_VALUE;
     private int minWidth = 0;
@@ -134,6 +134,10 @@ public class ImagesController {
         ImageInfo image;
         while((image = nextUpdate())!=null){
             this.updateImage(image);
+            
+            if(this.stop){
+                return;
+            }
         }
     }
     
