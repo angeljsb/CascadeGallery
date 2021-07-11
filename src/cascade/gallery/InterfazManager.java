@@ -344,7 +344,7 @@ public class InterfazManager implements FilesChangeListener {
         
         this.ventana.setTitle(createTitle(files));
         
-        this.showImagesPage();
+        this.showLoadPage();
         
         this.imagesPage.removeAll();
         
@@ -354,8 +354,11 @@ public class InterfazManager implements FilesChangeListener {
             images[i] = new ImageInfo(files[i]);
             ImageFixWidth view = new ImageFixWidth();
             images[i].onChange = view::setShowImage;
+            view.setLastSize(ImageLoader.getSize(files[i]));
             this.imagesPage.add(view);
         }
+        
+        this.showImagesPage();
         
         this.controller.setImages(images);
         this.controller.setCurrent(0);

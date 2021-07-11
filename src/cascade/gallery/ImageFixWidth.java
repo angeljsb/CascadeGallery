@@ -5,6 +5,7 @@
  */
 package cascade.gallery;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -47,10 +48,16 @@ public class ImageFixWidth extends JPanel {
     public ImageFixWidth(Image image){
         this.showImage = image;
     }
+    
+    public void setLastSize(Dimension size){
+        this.lastSize = size;
+    }
 
     @Override
     public void paintComponent(Graphics g) {
         if(this.showImage == null){
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(0, 0, this.getWidth(), this.getHeight());
             return;
         }
         
