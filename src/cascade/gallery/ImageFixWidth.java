@@ -94,7 +94,7 @@ public class ImageFixWidth extends JPanel {
      * @since v1.0.0
      */
     public void paintImageRealSize(Graphics g){
-        int imgWidth = showImage.getWidth(this);
+        int imgWidth = lastSize.width;
         
         if(imgWidth > this.getWidth()){
             this.paintImageAjustWidth(g);
@@ -103,7 +103,7 @@ public class ImageFixWidth extends JPanel {
         
         int imgX = (this.getWidth()/2) - (imgWidth/2);
         
-        g.drawImage(showImage, imgX, 0, this);
+        g.drawImage(showImage, imgX, 0, imgWidth, lastSize.height, this);
     }
     
     @Override
@@ -144,10 +144,6 @@ public class ImageFixWidth extends JPanel {
      */
     public void setShowImage(BufferedImage showImage) {
         this.showImage = showImage;
-        
-        if(showImage!=null){
-            this.lastSize = new Dimension(showImage.getWidth(), showImage.getHeight());
-        }
         
         this.updateUI();
     }

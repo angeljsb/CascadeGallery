@@ -131,28 +131,58 @@ public class ImagesController {
     }
     
     public void updateAllImages(){
-        ImageInfo image;
-        while((image = nextUpdate())!=null){
-            this.updateImage(image);
-            
-            if(this.stop){
-                return;
-            }
-        }
+        while(updateNextImage() && !this.stop){}
     }
     
-    private ImageInfo nextUpdate(){
+    private boolean updateNextImage(){
         for(int i=current; i<end; i++){
-            if(!images[i].isLoaded()){
-                return images[i];
+            if(updateImage(images[i])){
+                return true;
             }
         }
         for(int i=current-1; i>=start; i--){
-            if(!images[i].isLoaded()){
-                return images[i];
+            if(updateImage(images[i])){
+                return true;
             }
         }
-        return null;
+        return false;
+    }
+    
+    public boolean updateImage(ImageInfo image) {
+        boolean load = !image.isLoaded();
+        if(load){
+            this.loadImage(image);
+        }
+        
+        return this.validateSize(image) || load;
+    }
+    
+    public void loadImage(ImageInfo image){
+        BufferedImage loaded = ImageLoader.loadImage(image.getFile());
+        image.setImage(loaded);
+        image.setRealWidth(image.getCurrentWidth());
+    }
+    
+    public boolean validateSize(ImageInfo image){
+        if(maxWidth<image.getRealWidth()){
+            return this.resizeImage(image, maxWidth);
+        }else if(minWidth>image.getRealWidth()){
+            return this.resizeImage(image, minWidth);
+        }else if(this.shouldLoad(image)){
+            this.loadImage(image);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean resizeImage(ImageInfo image, int width){
+        if(image.getCurrentWidth() == width) return false;
+        if(this.shouldLoad(image)){
+            this.loadImage(image);
+        }
+        BufferedImage resized = ImageLoader.resizeImage(image.getImage(), width, -1);
+        image.setImage(resized);
+        return true;
     }
     
     public void deleteAllImages(){
@@ -166,39 +196,6 @@ public class ImagesController {
     
     public void deleteImage(ImageInfo image) {
         image.setImage(null);
-    }
-    
-    public void updateImage(ImageInfo image) {
-        if(!image.isLoaded()){
-            this.loadImage(image);
-        }
-        
-        this.validateSize(image);
-    }
-    
-    public void loadImage(ImageInfo image){
-        BufferedImage loaded = ImageLoader.loadImage(image.getFile());
-        image.setImage(loaded);
-        image.setRealWidth(image.getCurrentWidth());
-    }
-    
-    public void resizeImage(ImageInfo image, int width){
-        if(image.getCurrentWidth() == width) return;
-        if(this.shouldLoad(image)){
-            this.loadImage(image);
-        }
-        BufferedImage resized = ImageLoader.resizeImage(image.getImage(), width, -1);
-        image.setImage(resized);
-    }
-    
-    public void validateSize(ImageInfo image){
-        if(maxWidth<image.getRealWidth()){
-            this.resizeImage(image, maxWidth);
-        }else if(minWidth>image.getRealWidth()){
-            this.resizeImage(image, minWidth);
-        }else if(this.shouldLoad(image)){
-            this.loadImage(image);
-        }
     }
     
     private boolean shouldLoad(ImageInfo image){
