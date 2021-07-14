@@ -17,7 +17,7 @@ public class CascadeGallery {
      */
     public static void main(String[] args) {
         
-        App app = App.getInstance();
+        App app = App.getInstance(args);
         
     }
     

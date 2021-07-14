@@ -5,6 +5,7 @@
  */
 package cascade.gallery;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -24,7 +25,7 @@ public class ImageFixWidth extends JPanel {
     
     private boolean ajustWidth = false;
     
-    private int lastHeight = 0;
+    private Dimension lastSize = new Dimension(0, 0);
     
     /**
      * Crea un componente sin una imagen, el cual tendrá un tamaño de 0, 0
@@ -47,10 +48,16 @@ public class ImageFixWidth extends JPanel {
     public ImageFixWidth(Image image){
         this.showImage = image;
     }
+    
+    public void setLastSize(Dimension size){
+        this.lastSize = size;
+    }
 
     @Override
     public void paintComponent(Graphics g) {
         if(this.showImage == null){
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(0, 0, this.getWidth(), this.getHeight());
             return;
         }
         
@@ -87,7 +94,7 @@ public class ImageFixWidth extends JPanel {
      * @since v1.0.0
      */
     public void paintImageRealSize(Graphics g){
-        int imgWidth = showImage.getWidth(this);
+        int imgWidth = lastSize.width;
         
         if(imgWidth > this.getWidth()){
             this.paintImageAjustWidth(g);
@@ -96,17 +103,18 @@ public class ImageFixWidth extends JPanel {
         
         int imgX = (this.getWidth()/2) - (imgWidth/2);
         
-        g.drawImage(showImage, imgX, 0, this);
+        g.drawImage(showImage, imgX, 0, imgWidth, lastSize.height, this);
     }
     
     @Override
     public Dimension getPreferredSize(){
-        if(this.showImage == null){
-            return new Dimension(this.getWidth(),this.lastHeight);
+        int imgWidth = this.lastSize.width,
+                imgHeight = this.lastSize.height;
+        
+        if(imgHeight==0 || imgWidth==0){
+            return this.lastSize;
         }
         
-        int imgWidth = showImage.getWidth(this),
-                imgHeight = showImage.getHeight(this);
         float relation = (float)imgWidth/(float)imgHeight;
         
         if(this.isAjustWidth()){
@@ -136,9 +144,6 @@ public class ImageFixWidth extends JPanel {
      */
     public void setShowImage(BufferedImage showImage) {
         this.showImage = showImage;
-        if(showImage!=null && showImage.getWidth()<=this.getWidth()){
-            this.lastHeight = showImage.getHeight();
-        }
         
         this.updateUI();
     }
@@ -151,7 +156,7 @@ public class ImageFixWidth extends JPanel {
      * @since v1.0.0
      */
     public boolean isAjustWidth() {
-        return ajustWidth || showImage.getWidth(this) > this.getWidth();
+        return ajustWidth || lastSize.width > this.getWidth();
     }
 
     /**

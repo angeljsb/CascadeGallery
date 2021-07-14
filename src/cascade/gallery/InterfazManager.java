@@ -159,7 +159,7 @@ public class InterfazManager implements FilesChangeListener {
         container.add(containerButtons);
         this.notImagesPage.add(container);
         
-        controller.setMaxWidth(this.ventana.getWidth());
+        controller.setMaxWidth(this.ventana.getContentPane().getWidth());
         
         SizeListener l = new SizeListener((size) -> {
             if(size.width>0){
@@ -179,9 +179,7 @@ public class InterfazManager implements FilesChangeListener {
             Component comp = this.imagesPage.getComponentAt(this.imagesPage.getWidth()/2,scroll);
             int index = this.imagesPage.indexOf(comp);
             if(index < 0) return;
-            int min = Math.max(index-10, 0);
-            int max = Math.min(index+10, this.imagesPage.getComponentCount());
-            this.controller.setRange(min, max);
+            this.controller.setCurrent(index);
         });
     }
 
@@ -346,7 +344,7 @@ public class InterfazManager implements FilesChangeListener {
         
         this.ventana.setTitle(createTitle(files));
         
-        this.showImagesPage();
+        this.showLoadPage();
         
         this.imagesPage.removeAll();
         
@@ -356,11 +354,14 @@ public class InterfazManager implements FilesChangeListener {
             images[i] = new ImageInfo(files[i]);
             ImageFixWidth view = new ImageFixWidth();
             images[i].onChange = view::setShowImage;
+            view.setLastSize(ImageLoader.getSize(files[i]));
             this.imagesPage.add(view);
         }
         
+        this.showImagesPage();
+        
         this.controller.setImages(images);
-        this.controller.setRange(0, 10);
+        this.controller.setCurrent(0);
         
     }
     

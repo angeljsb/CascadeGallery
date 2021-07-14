@@ -21,8 +21,7 @@ public class ImagesController {
     
     private ImageInfo[] images = new ImageInfo[0];
     
-    private int start = 0;
-    private int end = 0;
+    private int start = 0, end = 0, current = -1;
     
     private int maxWidth = Integer.MAX_VALUE;
     private int minWidth = 0;
@@ -36,6 +35,10 @@ public class ImagesController {
 
     public int getEnd() {
         return end;
+    }
+    
+    public int getCurrent() {
+        return current;
     }
     
     public void setStart(int start){
@@ -54,6 +57,14 @@ public class ImagesController {
             this.proccessChange();
         }
         this.deleteAllImages();
+    }
+    
+    public void setCurrent(int current) {
+        if (this.current == current) return;
+        this.current = current;
+        int min = Math.max(0, current - 10);
+        int max = Math.min(this.images.length, current + 10);
+        this.setRange(min, max);
     }
 
     /**
@@ -111,6 +122,7 @@ public class ImagesController {
     
     public void proccessChange(){
         this.stopLoading();
+        if(images.length == 0) return;
         
         Runnable run = this::updateAllImages;
         this.loadThread = new Thread(run);
@@ -119,19 +131,58 @@ public class ImagesController {
     }
     
     public void updateAllImages(){
-        int initS = this.getStart();
-        for(int i = start; i<end; i++){
-            ImageInfo image = this.images[i];
-            
-            this.updateImage(image);
-            
-            if(this.stop){
-                return;
+        while(updateNextImage() && !this.stop){}
+    }
+    
+    private boolean updateNextImage(){
+        for(int i=current; i<end; i++){
+            if(updateImage(images[i])){
+                return true;
             }
         }
-        if(initS!=this.getStart()){
-            this.updateAllImages();
+        for(int i=current-1; i>=start; i--){
+            if(updateImage(images[i])){
+                return true;
+            }
         }
+        return false;
+    }
+    
+    public boolean updateImage(ImageInfo image) {
+        boolean load = !image.isLoaded();
+        if(load){
+            this.loadImage(image);
+        }
+        
+        return this.validateSize(image) || load;
+    }
+    
+    public void loadImage(ImageInfo image){
+        BufferedImage loaded = ImageLoader.loadImage(image.getFile());
+        image.setImage(loaded);
+        image.setRealWidth(image.getCurrentWidth());
+    }
+    
+    public boolean validateSize(ImageInfo image){
+        if(maxWidth<image.getRealWidth()){
+            return this.resizeImage(image, maxWidth);
+        }else if(minWidth>image.getRealWidth()){
+            return this.resizeImage(image, minWidth);
+        }else if(this.shouldLoad(image)){
+            this.loadImage(image);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean resizeImage(ImageInfo image, int width){
+        if(image.getCurrentWidth() == width) return false;
+        if(this.shouldLoad(image)){
+            this.loadImage(image);
+        }
+        BufferedImage resized = ImageLoader.resizeImage(image.getImage(), width, -1);
+        image.setImage(resized);
+        return true;
     }
     
     public void deleteAllImages(){
@@ -145,39 +196,6 @@ public class ImagesController {
     
     public void deleteImage(ImageInfo image) {
         image.setImage(null);
-    }
-    
-    public void updateImage(ImageInfo image) {
-        if(!image.isLoaded()){
-            this.loadImage(image);
-        }
-        
-        this.validateSize(image);
-    }
-    
-    public void loadImage(ImageInfo image){
-        BufferedImage loaded = ImageLoader.loadImage(image.getFile());
-        image.setImage(loaded);
-        image.setRealWidth(image.getCurrentWidth());
-    }
-    
-    public void resizeImage(ImageInfo image, int width){
-        if(image.getCurrentWidth() == width) return;
-        if(this.shouldLoad(image)){
-            this.loadImage(image);
-        }
-        BufferedImage resized = ImageLoader.resizeImage(image.getImage(), width, -1);
-        image.setImage(resized);
-    }
-    
-    public void validateSize(ImageInfo image){
-        if(maxWidth<image.getRealWidth()){
-            this.resizeImage(image, maxWidth);
-        }else if(minWidth>image.getRealWidth()){
-            this.resizeImage(image, minWidth);
-        }else if(this.shouldLoad(image)){
-            this.loadImage(image);
-        }
     }
     
     private boolean shouldLoad(ImageInfo image){
